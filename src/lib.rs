@@ -1,4 +1,5 @@
 use std::borrow::Borrow;
+use std::fmt;
 
 pub struct ErrorAnnotation<I, S> {
     pub info: I,
@@ -8,6 +9,16 @@ pub struct ErrorAnnotation<I, S> {
 impl<I, S> From<(I, S)> for ErrorAnnotation<I, S> {
     fn from((info, source): (I, S)) -> Self {
         ErrorAnnotation { info, source }
+    }
+}
+
+impl<I, S> fmt::Display for ErrorAnnotation<I, S>
+where
+    I: fmt::Display,
+    S: fmt::Display,
+{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}\nInfo: {}", self.source, self.info)
     }
 }
 

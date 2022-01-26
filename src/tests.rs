@@ -22,6 +22,12 @@ mod string {
         assert_eq!(info, "apple");
         assert_eq!(source, r#"Input "apple" != "banana""#);
     }
+
+    #[test]
+    fn display() {
+        let e = ErrorAnnotation::from((String::from("woot"), 42));
+        assert_eq!(e.to_string(), "42\nInfo: woot");
+    }
 }
 
 mod path {

@@ -1,4 +1,5 @@
 use std::borrow::Borrow;
+use std::future::Future;
 
 pub struct ErrorAnnotation<I, S> {
     pub info: I,
@@ -20,6 +21,19 @@ impl<I, S> ErrorAnnotation<I, S> {
     {
         let info = iref.to_owned();
         f(info.borrow()).map_err(|source| ErrorAnnotation { info, source })
+    }
+
+    pub async fn within_async<B, F, Fut, T>(iref: &B, f: F) -> Result<T, Self>
+    where
+        B: ToOwned<Owned = I> + ?Sized,
+        I: Borrow<B>,
+        F: FnOnce(&B) -> Fut,
+        Fut: Future<Output = Result<T, S>>,
+    {
+        let info = iref.to_owned();
+        f(info.borrow())
+            .await
+            .map_err(|source| ErrorAnnotation { info, source })
     }
 }
 

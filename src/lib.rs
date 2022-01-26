@@ -12,14 +12,14 @@ impl<I, S> From<(I, S)> for ErrorAnnotation<I, S> {
 }
 
 impl<I, S> ErrorAnnotation<I, S> {
-    pub fn within<B, F, T>(iref: &B, f: F) -> Result<T, Self>
+    pub fn within<B, F, T>(info: I, f: F) -> Result<T, Self>
     where
-        B: ToOwned<Owned = I> + ?Sized,
+        B: ?Sized,
         I: Borrow<B>,
         F: FnOnce(&B) -> Result<T, S>,
     {
-        let info = iref.to_owned();
-        f(info.borrow()).map_err(|source| ErrorAnnotation { info, source })
+        let iref = info.borrow();
+        f(iref).map_err(|source| ErrorAnnotation { info, source })
     }
 }
 

@@ -1,17 +1,17 @@
 use std::borrow::Borrow;
 
-pub struct Annotate<I, S> {
+pub struct ErrorAnnotation<I, S> {
     pub info: I,
     pub source: S,
 }
 
-impl<I, S> From<(I, S)> for Annotate<I, S> {
+impl<I, S> From<(I, S)> for ErrorAnnotation<I, S> {
     fn from((info, source): (I, S)) -> Self {
-        Annotate { info, source }
+        ErrorAnnotation { info, source }
     }
 }
 
-impl<I, S> Annotate<I, S> {
+impl<I, S> ErrorAnnotation<I, S> {
     pub fn within<B, F, T>(iref: &B, f: F) -> Result<T, Self>
     where
         B: ToOwned<Owned = I> + ?Sized,
@@ -19,7 +19,7 @@ impl<I, S> Annotate<I, S> {
         F: FnOnce(&B) -> Result<T, S>,
     {
         let info = iref.to_owned();
-        f(info.borrow()).map_err(|source| Annotate { info, source })
+        f(info.borrow()).map_err(|source| ErrorAnnotation { info, source })
     }
 }
 

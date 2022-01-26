@@ -1,5 +1,5 @@
 mod string {
-    use crate::Annotate;
+    use crate::ErrorAnnotation;
 
     fn is_banana(input: &str) -> Result<(), String> {
         if input == "banana" {
@@ -11,21 +11,21 @@ mod string {
 
     #[test]
     fn within_ok() {
-        let r = Annotate::within("banana", is_banana);
+        let r = ErrorAnnotation::within("banana", is_banana);
         assert!(r.is_ok());
     }
 
     #[test]
     fn within_err() {
-        let r = Annotate::within("apple", is_banana);
-        let Annotate { info, source } = r.err().unwrap();
+        let r = ErrorAnnotation::within("apple", is_banana);
+        let ErrorAnnotation { info, source } = r.err().unwrap();
         assert_eq!(info, "apple");
         assert_eq!(source, r#"Input "apple" != "banana""#);
     }
 }
 
 mod path {
-    use crate::Annotate;
+    use crate::ErrorAnnotation;
     use std::path::{Path, PathBuf};
 
     fn is_root(input: &Path) -> Result<(), String> {
@@ -43,15 +43,15 @@ mod path {
     #[test]
     fn within_ok() {
         let pb = PathBuf::from("/");
-        let r = Annotate::within(pb.as_path(), is_root);
+        let r = ErrorAnnotation::within(pb.as_path(), is_root);
         assert!(r.is_ok());
     }
 
     #[test]
     fn within_err() {
         let pb = PathBuf::from("/not/a/root/path");
-        let r = Annotate::within(pb.as_path(), is_root);
-        let Annotate { info, source } = r.err().unwrap();
+        let r = ErrorAnnotation::within(pb.as_path(), is_root);
+        let ErrorAnnotation { info, source } = r.err().unwrap();
         assert_eq!(info, pb);
         assert_eq!(
             source,

@@ -1,18 +1,15 @@
-use std::borrow::Borrow;
 use std::fmt;
 
-pub struct ErrorAnnotation<I, S> {
-    pub info: I,
+pub fn annotate<S, I>(info: I) -> impl FnOnce(S) -> ErrorAnnotation<S, I> {
+    ErrorAnnotation::annotate(info)
+}
+
+pub struct ErrorAnnotation<S, I> {
     pub source: S,
+    pub info: I,
 }
 
-impl<I, S> From<(I, S)> for ErrorAnnotation<I, S> {
-    fn from((info, source): (I, S)) -> Self {
-        ErrorAnnotation { info, source }
-    }
-}
-
-impl<I, S> fmt::Display for ErrorAnnotation<I, S>
+impl<S, I> fmt::Display for ErrorAnnotation<S, I>
 where
     I: fmt::Display,
     S: fmt::Display,
@@ -22,15 +19,9 @@ where
     }
 }
 
-impl<I, S> ErrorAnnotation<I, S> {
-    pub fn within<B, F, T>(info: I, f: F) -> Result<T, Self>
-    where
-        B: ?Sized,
-        I: Borrow<B>,
-        F: FnOnce(&B) -> Result<T, S>,
-    {
-        let iref = info.borrow();
-        f(iref).map_err(|source| ErrorAnnotation { info, source })
+impl<S, I> ErrorAnnotation<S, I> {
+    pub fn annotate(info: I) -> impl FnOnce(S) -> Self {
+        |source| ErrorAnnotation { source, info }
     }
 }
 

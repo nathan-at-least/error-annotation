@@ -1,7 +1,10 @@
 use std::fmt;
 
-pub fn annotate<S, I>(label: &'static str, info: I) -> impl FnOnce(S) -> ErrorAnnotation<S, I> {
-    ErrorAnnotation::annotate(label, info)
+pub fn annotate<S, F, I>(label: &'static str, mkinfo: F) -> impl FnOnce(S) -> ErrorAnnotation<S, I>
+where
+    F: FnOnce() -> I,
+{
+    ErrorAnnotation::annotate(label, mkinfo)
 }
 
 pub struct ErrorAnnotation<S, I> {
@@ -21,11 +24,14 @@ where
 }
 
 impl<S, I> ErrorAnnotation<S, I> {
-    pub fn annotate(label: &'static str, info: I) -> impl FnOnce(S) -> Self {
+    pub fn annotate<F>(label: &'static str, mkinfo: F) -> impl FnOnce(S) -> Self
+    where
+        F: FnOnce() -> I,
+    {
         move |source| ErrorAnnotation {
             source,
             label,
-            info,
+            info: mkinfo(),
         }
     }
 }

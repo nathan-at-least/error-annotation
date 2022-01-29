@@ -1,21 +1,15 @@
 use std::fmt;
 
-pub fn annotate<I, S>(info: I) -> impl FnOnce(S) -> ErrorAnnotation<I, S> {
+pub fn annotate<S, I>(info: I) -> impl FnOnce(S) -> ErrorAnnotation<S, I> {
     ErrorAnnotation::annotate(info)
 }
 
-pub struct ErrorAnnotation<I, S> {
-    pub info: I,
+pub struct ErrorAnnotation<S, I> {
     pub source: S,
+    pub info: I,
 }
 
-impl<I, S> From<(I, S)> for ErrorAnnotation<I, S> {
-    fn from((info, source): (I, S)) -> Self {
-        ErrorAnnotation::new(info, source)
-    }
-}
-
-impl<I, S> fmt::Display for ErrorAnnotation<I, S>
+impl<S, I> fmt::Display for ErrorAnnotation<S, I>
 where
     I: fmt::Display,
     S: fmt::Display,
@@ -25,13 +19,9 @@ where
     }
 }
 
-impl<I, S> ErrorAnnotation<I, S> {
-    pub fn new(info: I, source: S) -> Self {
-        ErrorAnnotation { info, source }
-    }
-
+impl<S, I> ErrorAnnotation<S, I> {
     pub fn annotate(info: I) -> impl FnOnce(S) -> Self {
-        |source| ErrorAnnotation { info, source }
+        |source| ErrorAnnotation { source, info }
     }
 }
 

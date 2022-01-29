@@ -27,7 +27,10 @@ mod str {
 
     #[test]
     fn display() {
-        let e = ErrorAnnotation::new("woot", 42);
+        let e = ErrorAnnotation {
+            source: 42,
+            info: "woot",
+        };
         assert_eq!(e.to_string(), "42\nInfo: woot");
     }
 }
@@ -80,7 +83,10 @@ mod path {
     #[test]
     fn display() {
         let pbd = PathBufDisp(PathBuf::from("/not/a/root/path"));
-        let e = ErrorAnnotation::new(pbd, 42);
+        let e = ErrorAnnotation {
+            source: 42,
+            info: pbd,
+        };
         assert_eq!(e.to_string(), "42\nInfo: /not/a/root/path");
     }
 }

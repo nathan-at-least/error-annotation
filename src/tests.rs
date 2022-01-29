@@ -1,5 +1,5 @@
 mod str {
-    use crate::{annotate, ErrorAnnotation};
+    use crate::{AnnotateResult, ErrorAnnotation};
 
     fn is_banana(input: &str) -> Result<(), String> {
         if input == "banana" {
@@ -12,14 +12,14 @@ mod str {
     #[test]
     fn within_ok() {
         let s = "banana";
-        let r = is_banana(s).map_err(annotate("fruit", s));
+        let r = is_banana(s).annotate_err("fruit", s);
         assert!(r.is_ok());
     }
 
     #[test]
     fn within_err() {
         let s = "apple";
-        let r = is_banana(s).map_err(annotate("fruit", s));
+        let r = is_banana(s).annotate_err("fruit", s);
         let ErrorAnnotation {
             info,
             label,
@@ -42,7 +42,7 @@ mod str {
 }
 
 mod path {
-    use crate::{annotate, ErrorAnnotation};
+    use crate::{AnnotateResult, ErrorAnnotation};
     use std::fmt;
     use std::path::{Path, PathBuf};
 
@@ -70,14 +70,14 @@ mod path {
     #[test]
     fn within_ok() {
         let pbd = PathBufDisp(PathBuf::from("/"));
-        let r = is_root(&pbd.0).map_err(annotate("path", pbd));
+        let r = is_root(&pbd.0).annotate_err("path", pbd);
         assert!(r.is_ok());
     }
 
     #[test]
     fn within_err() {
         let pbd = PathBufDisp(PathBuf::from("/not/a/root/path"));
-        let r = is_root(&pbd.0).map_err(annotate("path", pbd.clone()));
+        let r = is_root(&pbd.0).annotate_err("path", pbd.clone());
         let ErrorAnnotation {
             info,
             label,

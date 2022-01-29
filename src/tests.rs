@@ -12,26 +12,32 @@ mod str {
     #[test]
     fn within_ok() {
         let s = "banana";
-        let r = is_banana(s).map_err(annotate(s));
+        let r = is_banana(s).map_err(annotate("fruit", s));
         assert!(r.is_ok());
     }
 
     #[test]
     fn within_err() {
         let s = "apple";
-        let r = is_banana(s).map_err(annotate(s));
-        let ErrorAnnotation { info, source } = r.err().unwrap();
-        assert_eq!(info, "apple");
+        let r = is_banana(s).map_err(annotate("fruit", s));
+        let ErrorAnnotation {
+            info,
+            label,
+            source,
+        } = r.err().unwrap();
         assert_eq!(source, r#"Input "apple" != "banana""#);
+        assert_eq!(label, "fruit");
+        assert_eq!(info, "apple");
     }
 
     #[test]
     fn display() {
         let e = ErrorAnnotation {
             source: 42,
+            label: "thingy",
             info: "woot",
         };
-        assert_eq!(e.to_string(), "42\nInfo: woot");
+        assert_eq!(e.to_string(), "42\n-with thingy: woot");
     }
 }
 
@@ -64,20 +70,25 @@ mod path {
     #[test]
     fn within_ok() {
         let pbd = PathBufDisp(PathBuf::from("/"));
-        let r = is_root(&pbd.0).map_err(annotate(pbd));
+        let r = is_root(&pbd.0).map_err(annotate("path", pbd));
         assert!(r.is_ok());
     }
 
     #[test]
     fn within_err() {
         let pbd = PathBufDisp(PathBuf::from("/not/a/root/path"));
-        let r = is_root(&pbd.0).map_err(annotate(pbd.clone()));
-        let ErrorAnnotation { info, source } = r.err().unwrap();
-        assert_eq!(info, pbd);
+        let r = is_root(&pbd.0).map_err(annotate("path", pbd.clone()));
+        let ErrorAnnotation {
+            info,
+            label,
+            source,
+        } = r.err().unwrap();
         assert_eq!(
             source,
             r#"Input "/not/a/root/path" has parent "/not/a/root""#
         );
+        assert_eq!(label, "path");
+        assert_eq!(info, pbd);
     }
 
     #[test]
@@ -85,8 +96,9 @@ mod path {
         let pbd = PathBufDisp(PathBuf::from("/not/a/root/path"));
         let e = ErrorAnnotation {
             source: 42,
+            label: "path",
             info: pbd,
         };
-        assert_eq!(e.to_string(), "42\nInfo: /not/a/root/path");
+        assert_eq!(e.to_string(), "42\n-with path: /not/a/root/path");
     }
 }

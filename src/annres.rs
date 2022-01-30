@@ -6,7 +6,7 @@ use crate::{annotate, ErrorAnnotation};
 /// # Example
 ///
 /// ```
-/// use std::path::Path;
+/// use std::path::{Path, PathBuf};
 /// use error_annotation::{AnnotateResult, ErrorAnnotation};
 ///
 /// type IoErrorWithPath<'a> = ErrorAnnotation<std::io::Error, std::path::Display<'a>>;
@@ -14,6 +14,17 @@ use crate::{annotate, ErrorAnnotation};
 /// fn remove_dir_all(p: &Path) -> Result<(), IoErrorWithPath> {
 ///   std::fs::remove_dir_all(p).annotate_err("path", || p.display())
 /// }
+///
+/// let badpath = PathBuf::from("/this/path/does/not/exist");
+/// let res = remove_dir_all(&badpath);
+/// let err = res.err().unwrap();
+///
+/// assert_eq!(&err.to_string(), "
+///
+/// No such file or directory (os error 2)
+/// -with path: /this/path/does/not/exist
+///
+/// ".trim());
 /// ```
 pub trait AnnotateResult<T, E> {
     fn annotate_err<F, I>(self, label: &'static str, mkinfo: F) -> Result<T, ErrorAnnotation<E, I>>

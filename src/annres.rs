@@ -7,16 +7,17 @@ use crate::{annotate, ErrorAnnotation};
 ///
 /// ```
 /// use std::path::{Path, PathBuf};
+/// use std::fs::Metadata;
 /// use error_annotation::{AnnotateResult, ErrorAnnotation};
 ///
 /// type IoErrorWithPath<'a> = ErrorAnnotation<std::io::Error, std::path::Display<'a>>;
 ///
-/// fn remove_dir_all(p: &Path) -> Result<(), IoErrorWithPath> {
-///   std::fs::remove_dir_all(p).annotate_err("path", || p.display())
+/// fn metadata(p: &Path) -> Result<Metadata, IoErrorWithPath> {
+///   std::fs::metadata(p).annotate_err("path", || p.display())
 /// }
 ///
 /// let badpath = PathBuf::from("/this/path/does/not/exist");
-/// let res = remove_dir_all(&badpath);
+/// let res = metadata(&badpath);
 /// let err = res.err().unwrap();
 ///
 /// assert_eq!(&err.to_string(), "

@@ -14,12 +14,13 @@ use std::fmt;
 ///
 /// ```
 /// use std::path::Path;
+/// use std::fs::Metadata;
 /// use error_annotation::{ErrorAnnotation, annotate};
 ///
 /// type IoErrorWithPath<'a> = ErrorAnnotation<std::io::Error, std::path::Display<'a>>;
 ///
-/// fn remove_dir_all(p: &Path) -> Result<(), IoErrorWithPath> {
-///   std::fs::remove_dir_all(p).map_err(annotate("path", || p.display()))
+/// fn metadata(p: &Path) -> Result<Metadata, IoErrorWithPath> {
+///   std::fs::metadata(p).map_err(annotate("path", || p.display()))
 /// }
 /// ```
 pub fn annotate<S, F, I>(label: &'static str, mkinfo: F) -> impl FnOnce(S) -> ErrorAnnotation<S, I>

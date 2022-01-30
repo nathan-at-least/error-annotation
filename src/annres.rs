@@ -1,4 +1,4 @@
-use crate::{annotate, ErrorAnnotation};
+use crate::{annotate, Annotatable, ErrorAnnotation};
 
 /// A trait to extend `Result` with a convenient `annotate_err` method. This is the recommended
 /// interface for annotating errors directly on `Result` values.
@@ -31,6 +31,17 @@ pub trait AnnotateResult<T, E> {
     fn annotate_err<F, I>(self, label: &'static str, mkinfo: F) -> Result<T, ErrorAnnotation<E, I>>
     where
         F: FnOnce() -> I;
+
+    fn annotate_err_into<F, I>(self, label: &'static str, mkinfo: F) -> Result<T, E>
+    where
+        Self: Sized,
+        E: Annotatable,
+        F: FnOnce() -> I,
+        I: std::fmt::Display,
+    {
+        self.annotate_err(label, mkinfo)
+            .map_err(E::merge_annotation)
+    }
 }
 
 impl<T, E> AnnotateResult<T, E> for Result<T, E> {

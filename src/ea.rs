@@ -34,6 +34,46 @@ use std::fmt;
 ///
 /// ".trim());
 /// ```
+///
+/// # Multiple Annotations
+///
+/// Multiple annotations can be tracked by using an `ErrorAnnotation` type as a source, ie:
+/// `ErrorAnnotation<ErrorAnnotation<MyError, String>, usize>`.
+///
+/// Annotating errors with a nested type comes from simply chaining the annotation methods.
+///
+/// If the outermost `ErrorAnnotation` needs to be converted into a `std::io::Error`, the
+/// intermediate `ErrorAnnotation` values must be explicitly converted into `std::io::Error` when
+/// chaining in this way.
+///
+/// ## Example
+///
+/// ```
+/// use std::path::{Path, PathBuf};
+/// use std::fs::Metadata;
+/// use error_annotation::{AnnotateResult, ErrorAnnotation};
+///
+/// fn annotated_copy(src: &Path, dst: &Path) -> std::io::Result<u64> {
+///   let bytes = std::fs::copy(src, dst)
+///     .annotate_err("source", || src.display())
+///     .map_err(std::io::Error::from)
+///     .annotate_err("destination", || dst.display())?;
+///   Ok(bytes)
+/// }
+///
+/// let badsource = PathBuf::from("/this/path/does/not/exist");
+/// let dest = PathBuf::from("/tmp/woah-dude");
+/// let res = annotated_copy(&badsource, &dest);
+/// let err = res.err().unwrap();
+///
+/// assert_eq!(&err.to_string(), "
+///
+/// No such file or directory (os error 2)
+/// -with source: /this/path/does/not/exist
+/// -with destination: /tmp/woah-dude
+///
+/// ".trim());
+/// ```
 pub struct ErrorAnnotation<S, I> {
     pub source: S,
     pub label: &'static str,

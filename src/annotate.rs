@@ -1,6 +1,7 @@
 use crate::ErrorAnnotation;
 
-/// Capture diagnostic information in a closure that extends a source error type.
+/// Capture diagnostic information in a closure that extends a source error type into a wrapping
+/// [`ErrorAnnotation`].
 ///
 /// `annotate` captures a `label` and a diagnostic `info` construction closure, `mkinfo`, returning
 /// a closure that creates an [`ErrorAnnotation`] given a source error of type `S`. This API design

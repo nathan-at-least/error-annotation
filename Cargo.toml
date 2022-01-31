@@ -1,6 +1,6 @@
 [package]
 name = "error-annotation"
-version = "0.1.0"
+version = "0.1.1"
 description = "Annotate errors with diagnostic information."
 license = "MIT"
 repository = "https://github.com/nathan-at-least/error-annotation"

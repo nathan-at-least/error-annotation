@@ -4,6 +4,7 @@ use std::fmt;
 ///
 /// `ErrorAnnotation` combines a `source` error of type `S` with diagnostic `info` of type `I`
 /// which will be labeled with `label` when displayed.
+#[derive(Debug)]
 pub struct ErrorAnnotation<S, I> {
     pub source: S,
     pub label: &'static str,

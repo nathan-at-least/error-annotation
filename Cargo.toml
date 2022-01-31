@@ -2,6 +2,8 @@
 name = "error-annotation"
 version = "0.1.0"
 description = "Annotate errors with diagnostic information."
+license = "MIT"
+repository = "https://github.com/nathan-at-least/error-annotation"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
